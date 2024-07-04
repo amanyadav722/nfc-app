@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.net.Uri;
 import android.nfc.NfcAdapter;
 import android.nfc.NdefMessage;
 import android.nfc.NdefRecord;
@@ -114,6 +115,7 @@ public class MainActivity extends AppCompatActivity {
                 if (response.isSuccessful() && response.body() != null) {
                     Toast.makeText(MainActivity.this, "Server Response: " + response.body().getMessage(), Toast.LENGTH_LONG).show();
                     Log.d(TAG, "Server Response: " + response.body().getMessage());
+                    openBrowserWithToken(token);
                 } else {
                     Toast.makeText(MainActivity.this, "Token verification failed.", Toast.LENGTH_LONG).show();
                     Log.d(TAG, "Token verification failed: " + response.message());
@@ -126,6 +128,20 @@ public class MainActivity extends AppCompatActivity {
                 Log.e(TAG, "Error connecting to server: ", t);
             }
         });
+
+
+    }
+
+    private void openBrowserWithToken(String token) {
+        String url = "http://172.20.10.4:3000?token=" + token;
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.setData(Uri.parse(url));
+        if (intent.resolveActivity(getPackageManager()) != null) {
+            startActivity(intent);
+        } else {
+            Toast.makeText(MainActivity.this, "No application can handle this request. Please install a web browser.", Toast.LENGTH_LONG).show();
+            Log.e(TAG, "No application can handle this request. Please install a web browser.");
+        }
     }
 }
 
